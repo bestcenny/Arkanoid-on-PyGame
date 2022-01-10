@@ -56,8 +56,6 @@ paddle = Paddle()
 
 
 
-
-
 if __name__ == '__main__':
     pygame.init()
     size = (1200, 750)
