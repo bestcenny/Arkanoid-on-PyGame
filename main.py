@@ -28,44 +28,40 @@ class Ball(pygame.sprite.Sprite):
             self.vy = - self.vy
 
 
-class Paddle:
+class Paddle(pygame.sprite.Sprite):
     # (self, game_screen: pygame.Surface, coord_x=568, coord_y=718,
 
     def __init__(self):
-        self.paddle_image = pygame.image.load('textures/paddleRed.png')
-        self.rect = self.paddle_image.get_rect()
-        self.x = 568
-        self.y = 718
+        super().__init__()
+        self.image = pygame.image.load('textures/paddleRed.png')
+        self.rect = self.image.get_rect()
+        self.rect.center = (568, 718)
 
-    # перемещение платформы по нажатию
-    def move(self):
+    def update(self):
         key = pygame.key.get_pressed()
         speed = 10
         if key[pygame.K_RIGHT]:  # нажатие правой стрелки
-            if (self.x + self.rect[2]) + speed >= SIZE[0]:
-                self.x = SIZE[0] - self.rect[2]
+            if (self.rect.x + self.rect[2]) + speed >= SIZE[0]:
+                self.rect.x = SIZE[0] - self.rect[2]
             else:
-                self.x += speed
+                self.rect.x += speed
         elif key[pygame.K_LEFT]:  # нажатие левой стрелки
-            if self.x - speed <= 0:
-                self.x = 0
+            if self.rect.x - speed <= 0:
+                self.rect.x = 0
             else:
-                self.x -= speed
-
-    def draw(self):
-        screen.blit(self.paddle_image, (self.x, self.y))
+                self.rect.x -= speed
 
     def get_coords_x(self):
-        return self.x
+        return self.rect.x
 
     def get_coords_y(self):
-        return self.y
+        return self.rect.y
+
     def get_size(self):
         return self.rect
 
 
 SIZE = (1200, 750)
-paddle = Paddle()
 
 if __name__ == '__main__':
     pygame.init()
@@ -80,6 +76,8 @@ if __name__ == '__main__':
 
     all_sprites = pygame.sprite.Group()
     all_sprites.add(Ball(screen))
+    paddle = Paddle()
+    all_sprites.add(paddle)
 
     while running:  # Основной игровой цикл
         # обработка событий
@@ -90,11 +88,9 @@ if __name__ == '__main__':
                 pass
 
         all_sprites.update()
-        paddle.move()
         # обновление экрана
         screen.blit(background_image, (0, 0))
         all_sprites.draw(screen)
-        paddle.draw()
         pygame.display.flip()
         clock.tick(fps)
 
