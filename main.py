@@ -2,7 +2,7 @@ import pygame
 
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, game_screen: pygame.Surface, velocity=10):
+    def __init__(self, game_screen: pygame.Surface, velocity=15):
         super().__init__()
         self.image = pygame.image.load('textures/ballGrey.png')
         self.screen = game_screen
@@ -24,6 +24,22 @@ class Ball(pygame.sprite.Sprite):
         if (paddle.get_coords_x() <= self.rect.x <= paddle.get_coords_x() + paddle.get_size()[2])\
                 and self.rect.y + self.radius * 2 >= paddle.get_coords_y():
             self.vy = - self.vy
+        if pygame.sprite.spritecollideany(self, bricks):
+            i = pygame.sprite.spritecollideany(self, bricks)
+            if self.vx > 0:
+                delta_x = self.rect.right - i.rect.left
+            else:
+                delta_x = i.rect.right - self.rect.left
+            if self.vy > 0:
+                delta_y = i.rect.bottom - self.rect.top
+            else:
+                delta_y = self.rect.bottom - i.rect.top
+            if abs(delta_x - delta_y) < 2:
+                self.vx, self.vy = -self.vx, -self.vy
+            elif delta_x > delta_y:
+                self.vy = -self.vy
+            elif delta_y > delta_x:
+                self.vx = -self.vx
 
 
 class Paddle(pygame.sprite.Sprite):
@@ -38,7 +54,7 @@ class Paddle(pygame.sprite.Sprite):
 
     def update(self):
         key = pygame.key.get_pressed()
-        speed = 10
+        speed = 15
         if key[pygame.K_RIGHT]:  # нажатие правой стрелки
             if (self.rect.x + self.rect[2]) + speed >= SIZE[0]:
                 self.rect.x = SIZE[0] - self.rect[2]
@@ -68,12 +84,9 @@ class Brick(pygame.sprite.Sprite):
         self.image = pygame.image.load(f'textures/{PADDLE_COLORS[brick_color]}')
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
-        self.left, self.right = self.rect[0], self.rect[2]
-        self.top, self.bottom = self.rect[1], self.rect[3]
 
     def update(self):
-        if self.left <= ball.rect.x <= self.right and \
-                self.top <= ball.rect.x <= self.bottom:
+        if ball.rect.colliderect(self.rect):
             self.kill()
 
 
@@ -90,7 +103,6 @@ if __name__ == '__main__':
 
     background_image = pygame.image.load('textures/arkanoid back.jpg')
     fps = 60
-
     running = True
     print(pygame.image.load('textures/element_purple_rectangle.png').get_rect()[2])
     bricks = pygame.sprite.Group()
