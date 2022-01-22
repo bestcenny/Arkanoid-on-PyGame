@@ -1,4 +1,5 @@
-import pygame, sys
+import pygame
+import sys
 
 
 pygame.init()
@@ -251,7 +252,6 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                running = False
                 sys.exit(0)
             if event.type == pygame.KEYDOWN:
                 # пауза, отрисовка кнопки рестарта игры
